@@ -1,115 +1,76 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
-    <title>R-Type</title>
-    <style type="text/css">
-        html,body {
-            background-color: #25272b;
-            background-image: url(geekscontent.png);
-            background-position: 54px 105px;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            color: #fff;
-            font-family: helvetica, arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            font-size: 12pt;
-        }
-
-        #canvas {
-            border: 1px solid #555;
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            margin: auto;
-        }
-
-        #rating {
-            position: absolute;;
-            display: none;
-            width: 100px;
-        }
-
-        img {
-            border: 0;
-        }
-
-        #tg_button {
-            position: fixed;
-            right: 20px; bottom: 0;
-        }
-        #github_button {
-            position: fixed;
-            right: 80px; bottom: 0;
-        }
-        #ava_button {
-            position: fixed;
-            right: 140px; bottom: 0;
-        }
-
-        table.tbl {
-            font-family: "Arial", sans-serif;
-            color: white;
-            width: 100%;
-            text-align: left;
-            border-collapse: collapse;
-        }
-        table.tbl td, table.tbl th {
-            padding: 5px 4px;
-            text-align: center;
-        }
-        table.tbl td {
-            font-size: 13px;
-        }
-        table.tbl tr:not(.thead) {
-            border-top: 1px solid gray;
-        }
-        table.tbl tr.thead th {
-            font-size: 15px;
-            font-weight: normal;
-            text-align: left;
-        }
-    </style>
-    <!--<script type="text/javascript" src="engine.js"></script>-->
-
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+	<link rel="shortcut icon" href="favicon.png" type="image/x-icon">		
+	<title>R-Type</title>
+	
+	<link href="css.css" rel="stylesheet" type="text/css"/>
 </head>
+
+
 <body>
-<div id="rating" class="datagrid"></div>
-<canvas id="canvas">
-    <p>
-        Для игры вам необходим нормальный браузер:
-        <a href="http://www.opera.com/">Opera</a>,
-        <a href="http://www.google.com/chrome">Chrome</a>,
-        <a href="http://www.mozilla.com/firefox/">Firefox</a> or
-        <a href="http://www.apple.com/safari/">Safari</a>.
-    </p>
-</canvas>
 
-<base target="_blank">
-<div id="tg_button">
-    <p><a class="footer_btn" href="https://t.me/geekscontent" data-name="tg_channel"><img src="media/telegram.png" width="50" height="50"></a></p>
-</div>
-<div id="github_button">
-    <p><a class="footer_btn" href="https://github.com/NastassiaUcs/r-type" data-name="github"><img src="media/github.png" width="48" height="48"></a></p>
-</div>
-<div id="ava_button">
-    <p><a class="footer_btn" href="https:/t.me/ava_exmachina_bot" data-name="ava"><img src="media/support.png" width="50" height="50"></a></p>
+
+
+
+<div class="container">
+	<div class="item">
+  		<a href="https://t.me/geekscontent"><img class="ui image logo" src="geekscontent.png"></a>
+	</div>
+
+	<div class="item">  
+	   
+  	<canvas id="canvas">
+		<p>
+			Для игры вам необходим нормальный браузер:
+			<a href="http://www.opera.com/">Opera</a>,
+			<a href="http://www.google.com/chrome">Chrome</a>,
+			<a href="http://www.mozilla.com/firefox/">Firefox</a> or
+			<a href="http://www.apple.com/safari/">Safari</a>.
+		</p>
+	</canvas> 
+	</div>
+
+  	<div id="rating" class="item datagrid"></div>
+  
+
+  <div class="item">
+
+  	<p>Короче, слабаки, ваша цель - после нажатия на ENTER печатать летящие слова как можно быстрее. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.  </p>
+  </div>
+
+
 </div>
 
-<script src="storage.js?v=4"></script>
-<script src="rtype.js?v=5"></script>
-<script type="text/javascript">
-    rtype.init();
 
-    var now = new Date();
-    var e = document.createElement("script");
-    e.type = "text/javascript";
-    e.src = "engine.js?t=" + now.getTime();
-    document.body.appendChild(e);
-</script>
+
+
+
+	<script src="storage.js?v=2"></script>
+	<script src="rtype.js?v=1"></script>
+	<script type="text/javascript">
+		rtype.init();
+
+        var now = new Date();
+        var e = document.createElement("script");
+        e.type = "text/javascript";
+        e.src = "engine.js?t=" + now.getTime();
+        document.body.appendChild(e);
+	</script>
+
+	<base target="_blank">
+	   <div id="tg_button">
+			<p><a href="https://t.me/geekscontent"><img src="media/telegram.png" width="50" height="50"></a></p>	
+	   </div>
+	   <div id="github_button">	
+			<p><a href="https://github.com/NastassiaUcs/r-type"><img src="media/github.png" width="48" height="48"></a></p>
+	   </div>
+	   <div id="ava_button">	
+			<p><a href="https:/t.me/ava_exmachina_bot"><img src="media/support.png" width="50" height="50"></a></p>
+	   </div>
+	 
 </body>
 </html>
