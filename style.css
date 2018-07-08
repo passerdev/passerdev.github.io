@@ -19,6 +19,8 @@ html,body {
     top: 0;
     bottom: 0;
     margin: auto;
+    width: 360px;
+    height: 640px;
 }
 
 #rating, #settings {

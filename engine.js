@@ -856,9 +856,10 @@ ig.module('impact.system').requires('impact.timer', 'impact.image').defines(func
             this.realHeight = height * scale;
             this.clock = new ig.Timer();
             this.canvas = ig.$(canvasId);
-            this.canvas.width = this.realWidth;
-            this.canvas.height = this.realHeight;
+            this.canvas.width = this.realWidth * window.devicePixelRatio;
+            this.canvas.height = this.realHeight * window.devicePixelRatio;
             this.context = this.canvas.getContext('2d');
+            this.context.scale(window.devicePixelRatio, window.devicePixelRatio);
         },
         setGame: function (gameClass) {
             if (this.running) {
@@ -903,7 +904,7 @@ ig.module('impact.system').requires('impact.timer', 'impact.image').defines(func
             }
         },
         getDrawPos: function (p) {
-            return this.smoothPositioning ? (p * this.scale).round() : p.round() * this.scale;
+            return this.smoothPositioning ? p * this.scale : p.round() * this.scale;
         }
     });
 });
@@ -1378,7 +1379,7 @@ ig.module('impact.entity').requires('impact.animation', 'impact.impact').defines
         },
         draw: function () {
             if (this.currentAnim) {
-                this.currentAnim.draw(this.pos.x.round() - this.offset.x - ig.game.screen.x, this.pos.y.round() - this.offset.y - ig.game.screen.y);
+                this.currentAnim.draw(this.pos.x - this.offset.x - ig.game.screen.x, this.pos.y - this.offset.y - ig.game.screen.y);
             }
         },
         kill: function () {
@@ -2105,7 +2106,6 @@ ig.module('game.entities.enemy').requires('impact.entity', 'impact.font', 'game.
 
             ig.system.context.textAlign = 'right';
             ig.system.context.fillText(this.remainingWord, x, y);
-
         },
         kill: function () {
             ig.game.unregisterTarget(this.word.charAt(0), this);
@@ -2846,11 +2846,22 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
                 ig.system.context.globalAlpha = 1;
             }
         },
+        drawTitleLine: function (text, y) {
+            var w = ig.system.context.measureText(text).width;
+            ig.system.context.fillText(text, ig.system.width/2 - w/2, y);
+        },
         drawTitle: function () {
             var xs = ig.system.width / 2;
             var ys = ig.system.height / 4;
-            this.fontTitle.draw('Type Or Die', xs, ys, ig.Font.ALIGN.CENTER);
-            this.font.draw('Печатай или умри!', xs, ys + 90, ig.Font.ALIGN.CENTER);
+
+            ig.system.context.fillStyle = "blue";
+            ig.system.context.font = "17px serif";
+            this.drawTitleLine('Type Or Die', ys + 12)
+            //this.fontTitle.draw('Type Or Die', xs, ys, ig.Font.ALIGN.CENTER);
+
+            this.drawTitleLine('Печатай или умри!', ys + 102)
+            //this.font.draw('Печатай или умри!', xs, ys + 90, ig.Font.ALIGN.CENTER);
+
             // this.font.draw('ESC: Menu/Pause', xs, ys + 160, ig.Font.ALIGN.CENTER);
             this.font.draw('Переключись на русский', xs, ys + 190, ig.Font.ALIGN.CENTER);
             this.font.draw('Жми ENTER', xs, ys + 220, ig.Font.ALIGN.CENTER);
