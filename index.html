@@ -4,12 +4,10 @@
     <meta charset="utf-8">
     <meta name="description" content="Стреляй по космическим кораблям с помощью нажатий на клавиши! Чем быстрее скорость печати, тем больше шансов выжить.">
     <meta name="keywords" content="z-type russian typing speed type keys space invaders скорость печати клавиши печать русский по-русски ztype по-русски на русском клавиатурный тренажер космические корабли">
-    <meta property="og:image" content="https://pp.userapi.com/c845020/v845020435/c85b1/GAuDgDDmvmE.jpg">
-    <!-- <meta property="og:image:width" content="100px" /> -->
-    <!-- <meta property="og:image:height" content="100px" /> -->
+    <meta property="og:image" content="https://pp.userapi.com/c846520/v846520592/c701d/P9hzRUeYu9U.jpg">
     <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
     <title>Type Or Die</title>
-    <link rel="stylesheet" href="style.css?v=1">
+    <link rel="stylesheet" href="style.css?v=20">
     <!--<script type="text/javascript" src="engine.js"></script>-->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-122831375-1"></script>
     <script>
@@ -50,6 +48,12 @@
 <!-- /Yandex.Metrika counter -->
 </head>
 <body>
+    <div id="input_user_name">
+            <form id="form_user_name">
+            <input type="text" id="user_name" placeholder="Сохранить имя для рейтинга" />            
+            <button class="krut" type="submit">&#9658;</button>
+            </form>
+    </div>
 <div id="avg_speed">Средняя скорость:<br><span id="avg_speed_value">0</span> зн/мин</div>
 <div id="rating" class="datagrid"></div>
 <div id="settings">
@@ -72,15 +76,17 @@
 </div>
 
 <base target="_blank">
-<div id="tg_button">
-    <p><a class="footer_btn" href="https://t.me/geekscontent" data-name="tg_channel"><img src="media/telegram.png" width="50" height="50"></a></p>
-</div>
-<div id="github_button">
-    <p><a class="footer_btn" href="https://github.com/NastassiaUcs/type_or_die" data-name="github"><img src="media/github.png" width="48" height="48"></a></p>
-</div>
-<div id="ava_button">
-    <p><a class="footer_btn" href="https://t.me/ava_exmachina_bot" data-name="ava"><img src="media/support.png?v=1" width="50" height="50"></a></p>
-</div>
+    <form id="tg_button" action="https://t.me/geekscontent">
+        <button class="krut loh" title="Канал разработчиков">&#9658;</button>
+    </form>
+
+    <form id="github_button" action="https://github.com/NastassiaUcs/type_or_die">
+        <button class="krut loh" title="Код на github">&#9658;</button>
+    </form>
+
+    <form id="ava_button" action="https://t.me/ava_exmachina_bot">
+        <button class="krut loh" title="Написать разработчикам">&#9658;</button>
+    </form>
 
 <script src="storage.js?v=5"></script>
 <script src="https://vk.com/js/api/openapi.js?156" type="text/javascript"></script>

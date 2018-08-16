@@ -1,7 +1,11 @@
 window.CANVAS_WIDTH = 360;
 window.CANVAS_HEIGTH = 640;
 
-window.sendData = function(data) {
+window.sendData = function(data, callback) {
+    if (typeof callback === "undefined") {
+        callback = function() {}
+    }
+
     var xhr = new XMLHttpRequest();
 
     data['branch'] = 'master';
@@ -14,6 +18,12 @@ window.sendData = function(data) {
     xhr.onreadystatechange = function () {
         if (this.readyState != 4) return;
 
+        try {
+            callback(JSON.parse(xhr.responseText));
+        } catch (e) {
+            console.error(e);
+            callback(null);
+        }
         // console.log(data);
     };
 
@@ -21,6 +31,7 @@ window.sendData = function(data) {
 }
 
 window.rtype = (function () {
+    var userNameFormElement = document.getElementById('input_user_name');
     var ratingElement = document.getElementById('rating');
     var avgSpeedContainerElement = document.getElementById('avg_speed');
     var avgSpeedValueElement = document.getElementById('avg_speed_value');
@@ -131,9 +142,12 @@ window.rtype = (function () {
         avgSpeedValueElement.innerHTML = (speedSum / speedCount).toFixed(1);
 
         avgSpeedContainerElement.style.display = 'inline-block';
+        userNameFormElement.style.display = 'inline-block';
         ratingElement.style.left = 'calc(50% + ' + (CANVAS_WIDTH / 2 + 50) + 'px)';
         avgSpeedContainerElement.style.left = ratingElement.style.left;
+        userNameFormElement.style.left = ratingElement.style.left;
         avgSpeedContainerElement.style.top = 'calc(50% - ' + (tbl.offsetHeight / 2 + CANVAS_HEIGTH / 2) + 'px)';
+        userNameFormElement.style.top = 'calc(50% - ' + (tbl.offsetHeight / 2 + CANVAS_HEIGTH / 2 + 60) + 'px)';
         window.avgElement = avgSpeedContainerElement;
         ratingElement.style.top = (avgSpeedContainerElement.offsetTop + avgSpeedContainerElement.offsetHeight + 10) + 'px';
         // ratingElement.style.top = 'calc(50% - ' + (tbl.offsetHeight / 2 + CANVAS_HEIGTH / 2) + 'px)';
@@ -149,6 +163,7 @@ window.rtype = (function () {
         } else {
             ratingElement.style.display = 'none';
             avgSpeedContainerElement.style.display = 'none';
+            userNameFormElement.style.display = 'none';
         }
     }
 

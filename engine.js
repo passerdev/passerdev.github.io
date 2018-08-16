@@ -2545,7 +2545,13 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
             if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
                 mobile = true;
             }
-            sendData({action: "init", referrer: document.referrer, mobile: mobile});
+            sendData({action: "init", referrer: document.referrer, mobile: mobile}, 
+            function(data) {
+                console.log(data);
+                if (!data.result) {
+                    console.log('aga');
+                }
+            });
         },
         reset: function () {
             this.difficulty = rStorage.getSetting('difficulty', 'easy');
@@ -2795,7 +2801,7 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
                 speed: typingSpeed,
                 mobile: mobile,
                 typing_accuracy: typingAccuracy
-            };
+            };            
             sendData(gameData);
             rStorage.addGameRecord(gameData);
             rtype.drawRating();
