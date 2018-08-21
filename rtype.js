@@ -24,13 +24,40 @@ window.sendData = function(data, callback) {
             console.error(e);
             callback(null);
         }
-        // console.log(data);
     };
 
     xhr.send(body);
 }
 
+function test() {
+    sendData({name: ''}, 
+        function(data) {
+            console.log(data);
+        });
+}
+
+function setDisplayForuserNameFormElement() {
+    //test();
+    var userNameFormElement = document.getElementById('input_user_name');
+    var userNameFromServer = document.getElementById('user_name_from_server');
+    if (window.userNameFromServer) {
+        userNameFormElement.style.display = 'none';
+        
+        userNameFromServer.style.display = 'inline-block';
+        userNameFromServer.innerHTML = '<p>' + window.userNameFromServer + ':</p>'
+        userNameFromServer.style.left = window.styleLeftForuserNameFormElement;
+        userNameFromServer.style.top = 'calc(50% - ' + (window.offsetHeightForuserNameFormElement / 2 + CANVAS_HEIGTH / 2 + 20) + 'px)';
+    }
+    else {
+        userNameFromServer.style.display = 'none';
+        userNameFormElement.style.display = 'inline-block';
+        userNameFormElement.style.left = window.styleLeftForuserNameFormElement;
+        userNameFormElement.style.top = 'calc(50% - ' + (window.offsetHeightForuserNameFormElement / 2 + CANVAS_HEIGTH / 2 + 12) + 'px)';
+    }       
+}
+
 window.rtype = (function () {
+    var userNameFromServer = document.getElementById('user_name_from_server');
     var userNameFormElement = document.getElementById('input_user_name');
     var ratingElement = document.getElementById('rating');
     var avgSpeedContainerElement = document.getElementById('avg_speed');
@@ -79,10 +106,13 @@ window.rtype = (function () {
                 var e;
                 if (i < 0) {
                     tr.className = 'thead';
-                    e = document.createElement('th');
-                    e.innerHTML = fields[key];
+                    e = document.createElement('th');                    
+                    e.innerHTML = fields[key];                    
                 } else {
                     e = document.createElement('td');
+                    if (key === 'speed') {
+                        e.style.color = 'rgb(0, 126, 165)';
+                    }
                     var game = games[i];
                     if (key === 'share') {
                         if (game['speed']) {
@@ -110,8 +140,9 @@ window.rtype = (function () {
                                     sendData({
                                         action: 'vk_api_result',
                                         response: r
-                                    })
-                                })
+                                    })                                    
+                                    console.log('response', r);
+                                })                                
 
                                 return false;
                             })
@@ -138,17 +169,20 @@ window.rtype = (function () {
         if (speedCount === 0) {
             speedCount = 1;
         }
-
+            
         avgSpeedValueElement.innerHTML = (speedSum / speedCount).toFixed(1);
 
         avgSpeedContainerElement.style.display = 'inline-block';
-        userNameFormElement.style.display = 'inline-block';
+        //userNameFormElement.style.display = 'inline-block';
         ratingElement.style.left = 'calc(50% + ' + (CANVAS_WIDTH / 2 + 50) + 'px)';
         avgSpeedContainerElement.style.left = ratingElement.style.left;
-        userNameFormElement.style.left = ratingElement.style.left;
-        avgSpeedContainerElement.style.top = 'calc(50% - ' + (tbl.offsetHeight / 2 + CANVAS_HEIGTH / 2) + 'px)';
-        userNameFormElement.style.top = 'calc(50% - ' + (tbl.offsetHeight / 2 + CANVAS_HEIGTH / 2 + 60) + 'px)';
-        window.avgElement = avgSpeedContainerElement;
+        //userNameFormElement.style.left = ratingElement.style.left;
+        window.styleLeftForuserNameFormElement = ratingElement.style.left;
+        avgSpeedContainerElement.style.top = 'calc(50% - ' + (tbl.offsetHeight / 2 + CANVAS_HEIGTH / 2 - 32) + 'px)';
+        window.offsetHeightForuserNameFormElement = tbl.offsetHeight;
+        //userNameFormElement.style.top = 'calc(50% - ' + (tbl.offsetHeight / 2 + CANVAS_HEIGTH / 2 + 50) + 'px)';
+       
+        //window.avgElement = avgSpeedContainerElement;
         ratingElement.style.top = (avgSpeedContainerElement.offsetTop + avgSpeedContainerElement.offsetHeight + 10) + 'px';
         // ratingElement.style.top = 'calc(50% - ' + (tbl.offsetHeight / 2 + CANVAS_HEIGTH / 2) + 'px)';
         ratingElement.innerHTML = '';
@@ -157,13 +191,15 @@ window.rtype = (function () {
     }
 
     function drawRating() {
+        userNameFormElement.style.display = 'none';
+        userNameFromServer.style.display = 'none';
         var games = rStorage.getGames();
         if (games && games.length > 0) {
             drawUserRating(games);
+            setDisplayForuserNameFormElement();
         } else {
             ratingElement.style.display = 'none';
-            avgSpeedContainerElement.style.display = 'none';
-            userNameFormElement.style.display = 'none';
+            avgSpeedContainerElement.style.display = 'none';  
         }
     }
 
@@ -256,3 +292,38 @@ window.rtype = (function () {
         drawRating: drawRating
     }
 }());
+
+function saveName() {
+    var name = document.getElementById('user_name').value;
+    console.log(name);
+
+    var result = checkName(name);
+
+    if (result == 1 || result == 2) {
+        alert("Введите имя еще раз."); 
+        return;        
+    }
+
+    window.userNameFromServer = name;
+    sendData({name: window.userNameFromServer}, 
+    function(data) {
+        console.log(data);
+        if (!data.result) {
+            console.log('aga');
+        }
+        else {
+            setDisplayForuserNameFormElement();
+        }
+    });
+}
+
+function checkName(name) {
+    if (name == null) {
+        return 1;
+    }
+
+    name = name.trim();
+    if (name == '') {
+        return 2;
+    }
+}

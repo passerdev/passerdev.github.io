@@ -2546,11 +2546,10 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
                 mobile = true;
             }
             sendData({action: "init", referrer: document.referrer, mobile: mobile}, 
-            function(data) {
-                console.log(data);
-                if (!data.result) {
-                    console.log('aga');
-                }
+            function(data) {                
+                window.userNameFromServer = data.result;
+                //console.log(window.userNameFromServer);
+                //setDisplayForuserNameFormElement();
             });
         },
         reset: function () {
@@ -2782,9 +2781,14 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
         },
         setGameOver: function () {
             var typingSpeed = this.typingTime > 0 ? (this.hits / this.typingTime) * 1000 * 60 : 0;
-            typingSpeed = typingSpeed.toFixed(2);
+            typingSpeed = typingSpeed.toFixed(2);            
             var typingAccuracy = (this.hits / (this.typingMisses + this.hits)) * 100;
-            typingAccuracy = typingAccuracy.toFixed(2);
+            if (isNaN(typingAccuracy)) {
+                typingAccuracy = 0;
+            }
+            else {
+                typingAccuracy = typingAccuracy.toFixed(2);
+            }
             console.log('time', this.typingTime, 'speed', typingSpeed, 'accuracy', typingAccuracy);
             this.mode = RType.MODE.GAME_OVER;
             var mobile = false;

@@ -145,13 +145,17 @@ table.tbl tr.thead th {
     background-color: rgb(0, 126, 165);
 }
 
-#avg_speed {
+#avg_speed, #user_name_from_server {
     font-size: 24px;
     color: white;
     width: 250px;
     text-align: center;
     display: inline-block;
     position: absolute;
+}
+
+#user_name_from_server {
+    font-size: 20px !important;
 }
 
 #input_user_name {
@@ -167,38 +171,33 @@ table.tbl tr.thead th {
     height: 15px;
 }
 
-.krut {
+.btn {
 	display: block;
 	position: absolute;
-	width: 52px;
-	height: 52px;
-	color: rgb(52, 56, 61);
-	border-radius: 50px;
+	color: rgb(52, 56, 61);	
 	outline: 0;
-	z-index: 2;
-	top: -2px;
-	right: -1px;
-	border: 6px solid rgb(52, 56, 61);
-	font-size: 25px;
+	z-index: 2;	
+	right: 30px;
+	border: 6px solid rgb(52, 56, 61);	
 	text-indent: 0px;
 	padding-left: 9px;
 	padding-bottom: 3px;
 	text-align: center;
 }
-.krut:hover{
+
+.btn:hover{
 	color: rgb(0, 126, 165);
 	text-shadow: 0 0 10px rgb(0, 126, 165);
 	cursor: pointer;
 }
 
-#form_user_name input[type="text"], .krut {
+#form_user_name input[type="text"], .btn {
 	background: rgb(28, 30, 33);
-	box-shadow: inset -100px -100px 0 rgb(28, 30, 33); /*Prevent yellow autofill color*/
-	color: rgb(52, 56, 61);
+	box-shadow: inset -100px -100px 0 rgb(28, 30, 33);
 }
 
 #form_user_name {
-	height: 90px;
+	height: 45px;
 	width: 300px;
 	border-radius: 8px;
 	position: relative;
@@ -208,6 +207,7 @@ table.tbl tr.thead th {
 	border-top-right-radius: 8px;
 	border-top-left-radius: 8px;
 }
+
 #form_user_name input:last-of-type{
 	border-bottom-right-radius: 8px;
 	border-bottom-left-radius: 8px;
@@ -216,33 +216,32 @@ table.tbl tr.thead th {
 #form_user_name input[type="text"]{
 	position: relative;
 	display: block;
-	width: 250px;
-	height: 45px;
+	width: 230px;
+	height: 30px;
 	border: 0;
 	outline: 0;
-	top: -2px;
+	top: 10px;
 	padding: 0 0 0 20px;
-	font-weight: 700;
-}
-#form_user_name input[type="text"]:focus {
-	color: rgb(255, 255, 255);
+    font-weight: 700;
+    color: white;
 }
 
-/* #form_user_name p {
-	color: rgb(79, 85, 97);
-	padding: 0 20px;
-	font-weight: 700;
-	font-size: 12px;
-	margin: 5px 0 0 0;
-}
-#form_user_name p > a{
-	color: rgb(111, 119, 135);
-	text-decoration: none;
-}
-#form_user_name p > a:hover{
-	border-bottom: 1px solid;
-} */
+.small-btn {
+	width: 43px;
+    height: 43px;
+    border-radius: 46px;
+    font-size: 15px;
+    top: 4px;
+ }
 
-.loh {
-    top: -65px;
+.big-btn {
+    top: -65px;    
+	width: 52px;
+    height: 52px;
+    border-radius: 50px;
+    font-size: 25px;
+}
+
+#user_name {
+    color: white !important;
 }
