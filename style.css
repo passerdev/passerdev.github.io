@@ -157,3 +157,8 @@ table.tbl tr.thead th {
 .vk_btn {
     height: 15px;
 }
+
+#host {
+    position: absolute;
+    right: 200px; bottom: 0;
+}
