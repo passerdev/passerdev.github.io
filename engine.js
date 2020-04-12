@@ -38,7 +38,82 @@ Function.prototype.bind = function (bind) {
         return self.apply(bind || null, args);
     };
 };
+
+var key_object = null;
+var encrypted_data = null;
+var vector = window.crypto.getRandomValues(new Uint8Array(16));
+
+function bufferToBase64(buf) {
+    var binstr = Array.prototype.map.call(buf, function (ch) {
+        return String.fromCharCode(ch);
+    }).join('');
+    return btoa(binstr);
+}
+
+function encryptThenDecrypt() {
+    promise_key = window.crypto.subtle.importKey(
+        "raw",
+        convertStr('datamessage'),
+        {"name": "PBKDF2"},
+        false,
+        ["deriveKey"]
+    );
+    promise_key.then(function(importedPassword) {
+        return window.crypto.subtle.deriveKey(
+            {
+                "name": "PBKDF2",
+                "salt": convertStr('<input type="radio" name="dict" value="russian">'),
+                "iterations": 1000,
+                "hash": "SHA-256"
+            },
+            importedPassword,
+            {
+                "name": "AES-CBC",
+                "length": 128
+            },
+            false,
+            ["encrypt", "decrypt"]
+        );
+    }).then(function(key) {
+        key_object = key;
+        encrypt_data();
+    });
+    promise_key.catch = function(e) {
+        alert("Error while importing key: " + e.message);
+    }
+}
+
+function encrypt_data() {
+    var secretmessage = "record: 6";
+    var encrypt_promise = window.crypto.subtle.encrypt({name: "AES-CBC", iv: vector}, key_object, convertStr(secretmessage));
+    encrypt_promise.then(
+        function(result) {
+            result = new Uint8Array(result);
+            encrypted_data = new Uint8Array(result.length + vector.length);
+            encrypted_data.set(vector);
+            encrypted_data.set(result, vector.length);
+
+            console.log(encrypted_data);
+            var xhttp = new XMLHttpRequest();
+
+            xhttp.open("POST", "http://localhost:3000/index.php", true);
+            let res = bufferToBase64(encrypted_data);
+            xhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            xhttp.send("data="+ res);
+        },
+        function(e) {
+            alert("Error while encrypting data: " + e.message);
+        }
+    );
+}
+
+function convertStr(str) {
+    var encoder = new TextEncoder("utf-8");
+    return encoder.encode(str);
+}
+
 (function (window) {
+    encryptThenDecrypt();
     window.ig = {
         game: null,
         version: '1.15',
