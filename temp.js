@@ -1,11 +1,20 @@
-async function getDerivation(hash, salt, password, iterations, keyLength) {
+const encryptObj = { "id": "7f85f6db-7894-418d-996c-f3f4ac61bf8e", "sellerScore": 80, "salesCount": 5 };
+// we have to know all of these properties before calling the encryption method
+const salt = "SALT";
+const password = "PASSWORD";
+const keyLength = 48;
+
+
+async function getDerivation(salt, password, keyLength) {
     const textEncoder = new TextEncoder("utf-8");
     const passwordBuffer = textEncoder.encode(password);
     const importedKey = await crypto.subtle.importKey("raw", passwordBuffer, "PBKDF2", false, ["deriveBits"]);
 
     const saltBuffer = textEncoder.encode(salt);
-    const params = {name: "PBKDF2", hash: hash, salt: saltBuffer, iterations: iterations};
-    const derivation = await crypto.subtle.deriveBits(params, importedKey, keyLength*8);
+    const derivation = await crypto.subtle.deriveBits(
+        {name: "PBKDF2", hash: "SHA-256", salt: saltBuffer, iterations: 1000},
+        importedKey,
+        keyLength*8);
     return derivation;
 }
 
@@ -27,15 +36,10 @@ async function encrypt(text, keyObject) {
     return encryptedText;
 }
 
-const encryptObj = { "id": "7f85f6db-7894-418d-996c-f3f4ac61bf8e", "sellerScore": 80, "salesCount": 5 };
-// we have to know all of these properties before calling the encryption method
-const hash = "SHA-256";
-const salt = "SALT";
-const password = "PASSWORD";
-const iteratrions = 1000;
-const keyLength = 48;
-const derivation = await getDerivation(hash, salt, password, iteratrions, keyLength);
-const keyObject = await getKey(derivation);
-
+(async function () {
+    const derivation = await getDerivation(salt, password, keyLength);
+    const keyObject = await getKey(derivation);
 // calling encrypt
-const encryptedObject = await encrypt(JSON.stringify(encryptObj), keyObject);
+    const encryptedObject = await encrypt(JSON.stringify(encryptObj), keyObject);
+})
+

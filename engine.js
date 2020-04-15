@@ -2682,10 +2682,11 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
                 convertStr('datamessage'),
                 {"name": "PBKDF2"},
                 false,
-                ["deriveKey"]
+                ['deriveBits']
             );
+            debugger;
             promise_key.then(function (importedPassword) {
-                return window.crypto.subtle.deriveKey(
+                return window.crypto.subtle.deriveBits(
                     {
                         "name": "PBKDF2",
                         "salt": convertStr('<input type="radio" name="dict" value="russian">'),
@@ -2693,13 +2694,14 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
                         "hash": "SHA-256"
                     },
                     importedPassword,
-                    {
-                        "name": "AES-CBC",
-                        "length": 128
-                    },
-                    false,
-                    ["encrypt", "decrypt"]
+                    48 * 8
                 );
+            }).then(function(derivation) {
+                const keylen = 32;
+                const derivedKey = derivation.slice(0, keylen);
+                vector = derivation.slice(keylen);
+                return crypto.subtle.importKey('raw', derivedKey, { name: 'AES-CBC' }, false, ['encrypt', 'decrypt']);
+
             }).then(function (key) {
                 key_object = key;
                 this.encrypt_data();
