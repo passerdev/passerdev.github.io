@@ -6,6 +6,12 @@
 </head>
 <body>
 <script>
+    const ALGORITHM_NAME = "AES-GCM";
+    const ALGORITHM_NONCE_SIZE = 12;
+    const ALGORITHM_KEY_SIZE = 16 * 8;
+    const PBKDF2_SALT_SIZE = 16;
+    const PBKDF2_ITERATIONS = 32767;
+
     function bufferToBase64(buf) {
         var binstr = Array.prototype.map.call(buf, function (ch) {
             return String.fromCharCode(ch);
@@ -13,23 +19,49 @@
         return btoa(binstr);
     }
 
-    (async function () {
-        const key = await crypto.subtle.generateKey({name: 'AES-GCM', length: 128}, true, ['encrypt', 'decrypt'])
-        const text = "confidential message"
-// IV must be the same length (in bits) as the key
-        const iv = await crypto.getRandomValues(new Uint8Array(16));
-        const cyphertext = await crypto.subtle.encrypt({name: 'AES-GCM', tagLength: 32, iv}, key, new TextEncoder().encode(text));
+    function joinBuffers(a, b) {
+        let c = new Uint8Array(a.byteLength + b.byteLength);
 
-        var result = new Uint8Array(cyphertext);
-        var encrypted_data = new Uint8Array(result.length + iv.length);
-        encrypted_data.set(iv);
-        encrypted_data.set(result, iv.length);
+        for (let i = 0; i < a.length; i++) {
+            c[i] = a[i];
+        }
+        for (let i = 0; i < b.length; i++) {
+            c[i + a.length] = b[i];
+        }
+
+        return c;
+    }
+
+    async function encryptString(plaintext, password) {
+        // Generate a 128-bit salt using a CSPRNG and a nonce.
+        let salt = crypto.getRandomValues(new Uint8Array(PBKDF2_SALT_SIZE));
+        let nonce = crypto.getRandomValues(new Uint8Array(ALGORITHM_NONCE_SIZE));
+        let aesGcm = { name: ALGORITHM_NAME, iv: nonce };
+
+        // Derive a key using PBKDF2.
+        let deriveParams = { name: "PBKDF2", salt: salt, iterations: PBKDF2_ITERATIONS, hash: { name: "SHA-256" } };
+        let rawKey = await crypto.subtle.importKey("raw", (new TextEncoder()).encode(password), { name: "PBKDF2" }, false, ["deriveKey", "deriveBits"]);
+        let cryptoKey = await crypto.subtle.deriveKey(deriveParams, rawKey, { name: ALGORITHM_NAME, length: ALGORITHM_KEY_SIZE }, true, ["encrypt"]);
+
+        // Encrypt the string.
+        let ciphertext = await encryptWithCryptoKey(aesGcm, (new TextEncoder()).encode(plaintext), cryptoKey);
+        return bufferToBase64(joinBuffers(salt, ciphertext));
+    }
+
+    async function encryptWithCryptoKey(aesGcm, plaintext, cryptoKey) {
+        let ciphertext = await crypto.subtle.encrypt(aesGcm, cryptoKey, plaintext);
+        return joinBuffers(aesGcm.iv, new Uint8Array(ciphertext));
+    }
+
+    (async function () {
+        var encrypted_data = await encryptString('aaaaaaaaaaaaa', '3sc3RLrpd17');
 
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", "http://localhost:3000/index.php", true);
-        let res = bufferToBase64(encrypted_data);
+        // let res = bufferToBase64(encrypted_data);
+        let res = encrypted_data;
         xhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-        xhttp.send("data="+ res);
+        await xhttp.send("data="+ res);
     })();
 </script>
 </body>
