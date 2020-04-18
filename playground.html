@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/pbkdf2.js"></script>
 <body>
 <script>
     const ALGORITHM_NAME = "AES-GCM";
     const ALGORITHM_NONCE_SIZE = 12;
-    const ALGORITHM_KEY_SIZE = 16 * 8;
+    const ALGORITHM_KEY_SIZE = 256;
     const PBKDF2_SALT_SIZE = 16;
     const PBKDF2_ITERATIONS = 32767;
 
@@ -54,14 +57,22 @@
     }
 
     (async function () {
-        var encrypted_data = await encryptString('aaaaaaaaaaaaa', '3sc3RLrpd17');
+        var message = 'My string - Could also be an JS array/object ';
+        var iv = 'a1a2a3a4a5a6a7a8b1b2b3b4b5b6b7b8';
+        var key = 'c1c2c3c4c5c6c7c8d1d2d3d4d5d6d7d8c1c2c3c4c5c6c7c8d1d2d3d4d5d6d7d8'; // 256-bit hex encoded
+
+        var keyBytes = CryptoJS.enc.Hex.parse(key);
+        var ivBytes = CryptoJS.enc.Hex.parse(iv);
+
+        var encrypt = CryptoJS.AES.encrypt(message, keyBytes, {
+            iv: ivBytes,
+            padding: CryptoJS.pad.Pkcs7
+        }).ciphertext.toString(CryptoJS.enc.Base64);
 
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", "http://localhost:3000/index.php", true);
-        // let res = bufferToBase64(encrypted_data);
-        let res = encrypted_data;
         xhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-        await xhttp.send("data="+ res);
+        await xhttp.send("data="+ encrypt);
     })();
 </script>
 </body>
