@@ -39,22 +39,6 @@ Function.prototype.bind = function (bind) {
     };
 };
 
-var key_object = null;
-var encrypted_data = null;
-var vector = window.crypto.getRandomValues(new Uint8Array(16));
-
-function bufferToBase64(buf) {
-    var binstr = Array.prototype.map.call(buf, function (ch) {
-        return String.fromCharCode(ch);
-    }).join('');
-    return btoa(binstr);
-}
-
-function convertStr(str) {
-    var encoder = new TextEncoder("utf-8");
-    return encoder.encode(str);
-}
-
 (function (window) {
     window.ig = {
         game: null,
@@ -2676,40 +2660,10 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
             });
         },
 
-        postEvent: function () {
-            promise_key = window.crypto.subtle.importKey(
-                "raw",
-                convertStr('datamessage'),
-                {"name": "PBKDF2"},
-                false,
-                ['deriveBits']
-            );
-            debugger;
-            promise_key.then(function (importedPassword) {
-                return window.crypto.subtle.deriveBits(
-                    {
-                        "name": "PBKDF2",
-                        "salt": convertStr('<input type="radio" name="dict" value="russian">'),
-                        "iterations": 1000,
-                        "hash": "SHA-256"
-                    },
-                    importedPassword,
-                    48 * 8
-                );
-            }).then(function(derivation) {
-                const keylen = 32;
-                const derivedKey = derivation.slice(0, keylen);
-                vector = derivation.slice(keylen);
-                return crypto.subtle.importKey('raw', derivedKey, { name: 'AES-CBC' }, false, ['encrypt', 'decrypt']);
-
-            }).then(function (key) {
-                key_object = key;
-                this.encrypt_data();
-            }.bind(this));
-            promise_key.catch = function (e) {
-                alert("Error while importing key: " + e.message);
-            };
-            this.sent = true;
+        postEvent: async function () {
+            if (!this.sent) {
+                await this.encrypt_data();
+            }
         },
 
         spawnCurrentWave: function () {
@@ -2764,27 +2718,23 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
                 this.handleLetter(letters[i]);
         },
 
-        encrypt_data: function () {
-            let input = JSON.stringify(this.wave);
-            let encrypt_promise = window.crypto.subtle.encrypt({name: "AES-CBC", iv: vector}, key_object, convertStr(input));
-            encrypt_promise.then(
-                function(result) {
-                    result = new Uint8Array(result);
-                    encrypted_data = new Uint8Array(result.length + vector.length);
-                    encrypted_data.set(vector);
-                    encrypted_data.set(result, vector.length);
+        encrypt_data: async function () {
+            let salt = CryptoJS.lib.WordArray.random(16);
+            let key256Bits500Iterations = CryptoJS.PBKDF2("Secret Passphrase", salt, { keySize: 256/32, iterations: 500 });
+            let iv  = CryptoJS.enc.Hex.parse('101112131415161718191a1b1c1d1e1f');
 
-                    var xhttp = new XMLHttpRequest();
+            let encrypted = CryptoJS.AES.encrypt(JSON.stringify(this.wave), key256Bits500Iterations, { iv: iv });
+            let data_base64 = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+            let iv_base64   = encrypted.iv.toString(CryptoJS.enc.Base64);
+            let key_base64  = encrypted.key.toString(CryptoJS.enc.Base64);
 
-                    xhttp.open("POST", "http://localhost:3000/index.php", true);
-                    let res = bufferToBase64(encrypted_data);
-                    xhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-                    xhttp.send("data="+ res);
-                },
-                function(e) {
-                    alert("Error while encrypting data: " + e.message);
-                }
-            );
+            var xhttp = new XMLHttpRequest();
+
+            xhttp.open("POST", "http://localhost:3000/index.php", true);
+            xhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            xhttp.send("data="+ res).then(() => {
+                this.sent = true;
+            }).bind(this);
         },
 
         handleLetter: function (letter) {
