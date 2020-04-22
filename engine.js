@@ -2660,9 +2660,10 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
             });
         },
 
-        postEvent: async function () {
+        postEvent: function () {
             if (!this.sent) {
-                await this.encrypt_data();
+                this.sent = true;
+                this.encryptData();
             }
         },
 
@@ -2718,23 +2719,21 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
                 this.handleLetter(letters[i]);
         },
 
-        encrypt_data: async function () {
+        encryptData: function () {
             let salt = CryptoJS.lib.WordArray.random(16);
-            let key256Bits500Iterations = CryptoJS.PBKDF2("Secret Passphrase", salt, { keySize: 256/32, iterations: 500 });
+            let pbk = CryptoJS.PBKDF2("datamessage", salt, { keySize: 8, iterations: 500 });
             let iv  = CryptoJS.enc.Hex.parse('101112131415161718191a1b1c1d1e1f');
 
-            let encrypted = CryptoJS.AES.encrypt(JSON.stringify(this.wave), key256Bits500Iterations, { iv: iv });
-            let data_base64 = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
-            let iv_base64   = encrypted.iv.toString(CryptoJS.enc.Base64);
-            let key_base64  = encrypted.key.toString(CryptoJS.enc.Base64);
-
-            var xhttp = new XMLHttpRequest();
-
-            xhttp.open("POST", "http://localhost:3000/index.php", true);
-            xhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-            xhttp.send("data="+ res).then(() => {
-                this.sent = true;
-            }).bind(this);
+            let encrypted = CryptoJS.AES.encrypt(JSON.stringify(this.wave), pbk, { iv: iv });
+            let data = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+            let key  = encrypted.key.toString(CryptoJS.enc.Base64);
+            return fetch("http://localhost:3000/index.php", {
+                method: 'POST',
+                headers: {
+                   'Content-Type': "application/x-www-form-urlencoded"
+                },
+                body: "data="+ data + "&key=" + key
+            })
         },
 
         handleLetter: function (letter) {
