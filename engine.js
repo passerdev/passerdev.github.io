@@ -2723,8 +2723,17 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
             let salt = CryptoJS.lib.WordArray.random(16);
             let pbk = CryptoJS.PBKDF2("datamessage", salt, { keySize: 8, iterations: 500 });
             let iv  = CryptoJS.enc.Hex.parse('101112131415161718191a1b1c1d1e1f');
+            var typingSpeed = this.typingTime > 0 ? (this.hits / this.typingTime) * 1000 * 60 : 0;
+            typingSpeed = typingSpeed.toFixed(2);
 
-            let encrypted = CryptoJS.AES.encrypt(JSON.stringify(this.wave), pbk, { iv: iv });
+            let encrypted = CryptoJS.AES.encrypt(JSON.stringify({
+                wave: this.wave,
+                misses: this.misses,
+                hits: this.hits,
+                score: this.score,
+                difficulty: this.difficulty,
+                speed: typingSpeed
+            }), pbk, { iv: iv });
             let data = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
             let key  = encrypted.key.toString(CryptoJS.enc.Base64);
             return fetch("http://localhost:3000/index.php", {
