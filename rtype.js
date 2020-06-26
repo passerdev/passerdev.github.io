@@ -142,8 +142,8 @@ window.rtype = (function () {
         ratingElement.style.display = 'inline-block';
     }
 
-    function drawRating() {
-        var games = rStorage.getGames();
+    async function drawRating() {
+        var games = await rStorage.getGames();
         if (games && games.length > 0) {
             drawUserRating(games);
         } else {
