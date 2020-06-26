@@ -15,8 +15,7 @@ window.rStorage = (function () {
 
 
     async function getGames(settings) {
-        var key = getStorageKeyWithSettings('games', settings);
-        var response = await fetch("http://localhost:3000/get.php");
+        var response = await fetch(`http://localhost:3000/get.php?difficulty=${settings.difficulty}`);
         var games = await response.json();
         if (!games) {
             return [];
