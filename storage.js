@@ -14,14 +14,13 @@ window.rStorage = (function () {
     }
 
 
-    function getGames(settings) {
-        var key = getStorageKeyWithSettings('games', settings);
-        var games = localStorage.getItem(key);
+    async function getGames(settings) {
+        var response = await fetch(`http://localhost:3000/get.php?difficulty=${settings.difficulty}`);
+        var games = await response.json();
         if (!games) {
             return [];
         } else {
             try {
-                games = JSON.parse(games);
                 games.sort(function(g1, g2) {
                     return g2['score'] - g1['score'];
                 })
@@ -62,16 +61,16 @@ window.rStorage = (function () {
 
 
     return {
-        addGameRecord: function(gameData) {
+        addGameRecord: async function(gameData) {
             var settings = getSettings();
             gameData['time'] = Date.now();
-            var games = getGames(settings);
+            var games = await getGames(settings);
             games.push(gameData);
             saveGames(games, settings);
         },
-        getGames: function() {
+        getGames: async function() {
             var settings = getSettings();
-            return getGames(settings);
+            return await getGames(settings);
         },
         getSetting: getSetting,
         saveSetting: saveSetting

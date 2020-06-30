@@ -38,6 +38,7 @@ Function.prototype.bind = function (bind) {
         return self.apply(bind || null, args);
     };
 };
+
 (function (window) {
     window.ig = {
         game: null,
@@ -2522,6 +2523,7 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
             50: true,
             100: true
         },
+        sent: false,
         wave: {},
         init: function () {
             var bgmap = new ig.BackgroundMap(62, [
@@ -2657,6 +2659,14 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
                 return Math.random() - 0.5;
             });
         },
+
+        postEvent: function () {
+            if (!this.sent) {
+                this.sent = true;
+                this.encryptData();
+            }
+        },
+
         spawnCurrentWave: function () {
             if (!this.wave.spawn.length) {
                 if (this.entities.length <= 1 && !this.waveEndTimer) {
@@ -2707,6 +2717,32 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
             event.target.value = '';
             for (var i=0; i<letters.length; i++) //ввод в поле не всегда работает по буквам, например при непрерывном вводе (swype keyboard) вставляются целые слова
                 this.handleLetter(letters[i]);
+        },
+
+        encryptData: function () {
+            let salt = CryptoJS.lib.WordArray.random(16);
+            let pbk = CryptoJS.PBKDF2("datamessage", salt, { keySize: 8, iterations: 500 });
+            let iv  = CryptoJS.enc.Hex.parse('101112131415161718191a1b1c1d1e1f');
+            var typingSpeed = this.typingTime > 0 ? (this.hits / this.typingTime) * 1000 * 60 : 0;
+            typingSpeed = typingSpeed.toFixed(2);
+
+            let encrypted = CryptoJS.AES.encrypt(JSON.stringify({
+                wave: this.wave,
+                misses: this.misses,
+                hits: this.hits,
+                score: this.score,
+                difficulty: this.difficulty,
+                speed: typingSpeed
+            }), pbk, { iv: iv });
+            let data = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+            let key  = encrypted.key.toString(CryptoJS.enc.Base64);
+            return fetch("http://localhost:3000/index.php", {
+                method: 'POST',
+                headers: {
+                   'Content-Type': "application/x-www-form-urlencoded"
+                },
+                body: "data="+ data + "&key=" + key
+            })
         },
 
         handleLetter: function (letter) {
@@ -2847,6 +2883,7 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
                 this.entities[i].drawLabel && this.entities[i].drawLabel();
             }
             if (this.mode == RType.MODE.GAME) {
+                this.sent = false;
                 this.drawUI();
             } else if (this.mode == RType.MODE.TITLE) {
                 this.drawTitle();
@@ -2889,6 +2926,9 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
             ig.system.context.globalAlpha = 1;
         },
         drawGameOver: function () {
+            if (!this.sent) {
+                this.postEvent()
+            }
             var xs = ig.system.width / 2;
             var ys = ig.system.height / 4;
             var acc = this.hits ? this.hits / (this.hits + this.misses) * 100 : 0;
