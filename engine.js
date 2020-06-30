@@ -126,7 +126,6 @@ Function.prototype.bind = function (bind) {
             return ig;
         },
         defines: function (body) {
-            name = ig._current.name;
             ig._current.body = body;
             ig._current = null;
             ig._execModules();
@@ -2736,7 +2735,7 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
             }), pbk, { iv: iv });
             let data = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
             let key  = encrypted.key.toString(CryptoJS.enc.Base64);
-            return fetch("http://localhost:3000/index.php", {
+            return fetch("http://api.typeordie.space/", {
                 method: 'POST',
                 headers: {
                    'Content-Type': "application/x-www-form-urlencoded"
