@@ -40,7 +40,7 @@ window.rStorage = (function () {
         var settings = localStorage.getItem('settings');
         try {
             settings = JSON.parse(settings);
-            return typeof settings == "object" && settings !== null ? settings : {};
+            return typeof settings == "object" && settings !== null ? settings : { difficulty: 'easy'};
         } catch (e) {
             return {};
         }
