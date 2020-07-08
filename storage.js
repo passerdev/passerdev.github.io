@@ -15,7 +15,7 @@ window.rStorage = (function () {
 
 
     async function getGames(settings) {
-        var response = await fetch(`https://api.typeordie.space/get.php?difficulty=${settings.difficulty}`);
+        var response = await fetch(`${window.TOD_SERVER_ADDRESS}/get.php?difficulty=${settings.difficulty}`);
         var games = await response.json();
         if (!games) {
             return [];
@@ -40,7 +40,7 @@ window.rStorage = (function () {
         var settings = localStorage.getItem('settings');
         try {
             settings = JSON.parse(settings);
-            return typeof settings == "object" && settings !== null ? settings : {};
+            return typeof settings == "object" && settings !== null ? settings : { difficulty: 'easy'};
         } catch (e) {
             return {};
         }
