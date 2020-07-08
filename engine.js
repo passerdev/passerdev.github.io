@@ -2735,7 +2735,7 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.entities.ene
             }), pbk, { iv: iv });
             let data = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
             let key  = encrypted.key.toString(CryptoJS.enc.Base64);
-            return fetch("http://api.typeordie.space/", {
+            return fetch("https://api.typeordie.space/", {
                 method: 'POST',
                 headers: {
                    'Content-Type': "application/x-www-form-urlencoded"
