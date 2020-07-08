@@ -1,5 +1,6 @@
 window.CANVAS_WIDTH = 360;
 window.CANVAS_HEIGTH = 640;
+window.TOD_SERVER_ADDRESS = "https://api.typeordie.space";
 
 window.sendData = function(data) {
     var xhr = new XMLHttpRequest();
